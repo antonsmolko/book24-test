@@ -62,7 +62,7 @@ export default {
 
     computed: {
         limitedSearchHistory () {
-            return this.$store.getters['search/takeSearchHistory'](4)
+            return this.$store.getters['search/takeSearchHistory'](this.$config.SEARCH_HISTORY_LIMIT)
         }
     },
 
