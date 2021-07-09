@@ -21,12 +21,10 @@
                 >
                     {{ item }}
                     <button
-                        @click="removeItem(item)"
+                        @click.stop="removeItem(item)"
                         type="button"
                         class="search__suggestions--clear"
-                    >
-                        <icon-clear />
-                    </button>
+                    ><icon-clear /></button>
                 </a>
             </li>
         </ul>
@@ -45,15 +43,7 @@ export default {
     },
 
     model: {
-        prop: 'model',
         event: 'search'
-    },
-
-    props: {
-        model: {
-            type: String,
-            default: ''
-        }
     },
 
     data: () => ({

@@ -11,13 +11,13 @@
         <button type="submit" class="search__form-group--button">Найти</button>
     </div>
         <div class="search__dropdown">
-            <search-history-list v-model="query" @search="search"/>
+            <search-history-list v-if="searchHistory" v-model="query" @search="search"/>
         </div>
     </form>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import SearchFormInput from './components/SearchFormInput'
 import SearchHistoryList from './components/SearchHistoryList'
 
@@ -35,9 +35,14 @@ export default {
         processState: 'filling',
         uiState: 'focusout',
         query: '',
-        searchHistory: [],
         suggestions: []
     }),
+
+    computed: {
+        ...mapState('search', [
+            'searchHistory'
+        ])
+    },
 
     methods: {
         ...mapActions('search', [
