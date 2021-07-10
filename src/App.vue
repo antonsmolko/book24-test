@@ -1,28 +1,12 @@
 <template>
     <div id="app">
-        <div class="container">
-            <search />
-        </div>
+        <router-view :key="$route.fullPath"/>
     </div>
 </template>
 
 <script>
-import Search from '@/components/search'
 
 export default {
-    name: 'App',
-
-    components: {
-        Search
-    }
+    name: 'App'
 }
 </script>
-
-<style>
-.container {
-    max-width: 1600px;
-    margin: 20vh auto;
-    display: flex;
-    justify-content: center;
-}
-</style>

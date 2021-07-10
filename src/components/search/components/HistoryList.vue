@@ -3,7 +3,7 @@
         <div class="search__suggestions--title">
             История поиска
             <button
-                @click="clearAll"
+                @click.prevent.stop="clearAll"
                 class="search__suggestions--title-clear"
                 type="button"
             >Очистить</button>
@@ -14,18 +14,18 @@
                 :key="index"
                 class="search__suggestions--item"
             >
-                <a
-                    @click.prevent="$emit('search', item)"
+                <router-link
+                    :to="`/search/?q=${item}`"
+                    @click.native="$emit('click', item)"
                     class="search__suggestions--link"
-                    href="#"
                 >
                     {{ item }}
-                    <button
-                        @click.stop="removeItem(item)"
-                        type="button"
-                        class="search__suggestions--clear"
-                    ><icon-clear /></button>
-                </a>
+                </router-link>
+                <button
+                    @click.stop="removeItem(item)"
+                    type="button"
+                    class="search__suggestions--clear"
+                ><icon-clear/></button>
             </li>
         </ul>
     </div>
@@ -36,14 +36,14 @@ import { mapGetters, mapActions } from 'vuex'
 import IconClear from '@/components/icons/IconClear'
 
 export default {
-    name: 'DropdownSearchHistoryList',
+    name: 'HistoryList',
 
     components: {
         IconClear
     },
 
     model: {
-        event: 'search'
+        event: 'click',
     },
 
     data: () => ({

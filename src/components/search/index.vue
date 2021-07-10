@@ -2,46 +2,80 @@
     <form ref="search" @submit.prevent="submit" autocomplete="off" class="search">
         <div class="search__form-group" :class="{ '_focus': uiState === 'focusin' }">
             <div class="search__form-group--body">
-                <search-form-input
-                    v-model="query"
-                    @focusin="handleFocusing"
-                    @focusout="handleFocusout"
-                />
+                <search-form-input v-model="query" @focusin="handleFocusing"/>
             </div>
             <button type="submit" class="search__form-group--button">Найти</button>
         </div>
         <div v-if="isVisibleDropdown" class="search__dropdown">
-            <dropdown-search-history-list
-                v-if="isVisibleHistory"
-                v-model="query"
-                @search="search"
-            />
-            <dropdown-popular-list
-                v-if="isVisiblePopular"
-                :list="popular"
-                :query="query"
-            />
+            <div v-if="isVisibleSuggestions" class="search__suggestions">
+                <ul class="search__suggestions--list">
+                    <hint-item
+                        v-for="item in hints"
+                        :key="item.link"
+                        :query="query"
+                        :item="item"
+                    />
+                    <category-item
+                        v-for="item in catalogs"
+                        :key="item.link"
+                        :query="query"
+                        :item="item"
+                    />
+                    <product-item
+                        v-for="item in products"
+                        :key="item.meta.id"
+                        :query="query"
+                        :item="item"
+                    />
+                </ul>
+            </div>
+            <template v-else>
+                <history-list
+                    v-if="isVisibleHistory"
+                    v-model="query"
+                    :query="query"
+                    @click="addSearchHistoryItem"
+                />
+                <popular-list
+                    v-if="isVisiblePopular"
+                    :list="popularPhrases"
+                    :query="query"
+                    @click="addSearchHistoryItem"
+                />
+            </template>
         </div>
     </form>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import get from 'lodash/get'
 import SearchFormInput from '@/components/search/components/SearchFormInput'
-import DropdownSearchHistoryList from '@/components/search/components/DropdownSearchHistoryList'
-import DropdownPopularList from '@/components/search/components/DropdownPopular/DropdownPopularList'
+import HistoryList from '@/components/search/components/HistoryList'
+import PopularList from '@/components/search/components/PopularList'
+import HintItem from "@/components/search/components/Suggestions/HintItem"
+import CategoryItem from "@/components/search/components/Suggestions/CategoryItem"
+import ProductItem from "@/components/search/components/Suggestions/ProductItem"
+import debounce from 'lodash/debounce'
+import config from '@/config'
+
+const _debounce = debounce(f => f(), config.SEARCH_DELAY)
 
 export default {
     name: 'Search',
 
     components: {
         SearchFormInput,
-        DropdownSearchHistoryList,
-        DropdownPopularList
+        HistoryList,
+        PopularList,
+        HintItem,
+        CategoryItem,
+        ProductItem,
     },
 
     data: () => ({
-        processState: 'filling',
+        searchProcessState: 'initial',
+        popularProcessState: 'initial',
         uiState: 'initial',
         query: '',
         trackOutsideClick: null
@@ -50,32 +84,44 @@ export default {
     computed: {
         ...mapState('search', [
             'searchHistory',
+            'popularPhrases'
         ]),
         ...mapGetters('search', [
-            'popular',
+            'hints',
             'catalogs',
             'products',
             'suggestionsLength'
         ]),
         isVisibleDropdown () {
-            return this.uiState !== 'initial' && (this.isVisibleHistory || this.isVisiblePopular)
+            return this.uiState === 'opened' && (this.isVisibleHistory || this.isVisiblePopular || this.isVisibleSuggestions)
         },
         isVisibleHistory () {
-            return !this.query && this.searchHistory.length > 0
+            return this.searchHistory.length > 0
         },
         isVisiblePopular () {
-            return this.query && this.popular.length > 0
+            return this.popularProcessState === 'success' && this.popularPhrases.length > 0
+        },
+        isVisibleSuggestions () {
+            return this.query.trim() && this.suggestionsLength > 0
         }
     },
 
     watch: {
         query () {
-            this.search()
+            _debounce(this.search)
         }
     },
 
-    created () {
+    async created () {
+        this.query = get(this.$route, 'query.q', '').trim()
+
         this.fetchSearchHistory()
+
+        this.popularProcessState = 'request'
+
+        await this.fetchPopularPhrases()
+
+        this.popularProcessState = 'success'
     },
 
     mounted () {
@@ -88,22 +134,25 @@ export default {
 
     methods: {
         ...mapActions('search', [
+            'fetchPopularPhrases',
             'fetchSearchHistory',
             'addSearchHistoryItem',
             'fetchSuggestions'
         ]),
 
         handleFocusing () {
-            this.uiState = 'focusin'
+            this.uiState = 'opened'
+            this.searchProcessState = 'filling'
             this.search()
         },
 
-        handleFocusout () {
-            this.uiState = 'focusout'
-        },
+        submit () {
+            const q = this.query
+            this.addSearchHistoryItem(q)
 
-        async submit () {
-            this.addSearchHistoryItem(this.query)
+            if (q !== this.$route.query.q) {
+                this.$router.push({ name: 'search', query: { q } })
+            }
         },
 
         async search () {
@@ -113,27 +162,29 @@ export default {
                 return
             }
 
-            this.processState = 'request'
+            this.searchProcessState = 'request'
 
             await this.fetchSuggestions(query)
 
-            this.processState = 'success'
+            this.searchProcessState = 'success'
         },
 
         listenOutsideClick () {
-            document.addEventListener('click', this.initUiStateByClickTarget)
+            document.addEventListener('click', this.setStatesByClickTarget)
         },
 
         unListenOutsideClick () {
-            document.removeEventListener('click', this.initUiStateByClickTarget)
+            document.removeEventListener('click', this.setStatesByClickTarget)
         },
 
-        initUiStateByClickTarget ({ target }) {
+        setStatesByClickTarget ({ target }) {
             const searchEl = this.$refs.search
             const isClickInside = searchEl.contains(target)
 
+            this.uiState = isClickInside ? 'opened' : 'initial'
+
             if (!isClickInside) {
-                this.uiState = 'initial'
+                this.searchProcessState = 'initial'
             }
         }
     }

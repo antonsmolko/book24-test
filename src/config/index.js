@@ -7,7 +7,7 @@ const config = Object.freeze({
   LIMIT_PRODUCT: 5,
   LIMIT_SECTION: 3,
   LIMIT_PODBORKI: 0,
-  PREFIX_LINK_POPULAR: '/search/',
+  PREFIX_LINK_HINT: '/search/',
   PREFIX_LINK_CATALOG: '/catalog/',
   PREFIX_LINK_PRODUCT: '/product/',
   SEARCH_DELAY: 400

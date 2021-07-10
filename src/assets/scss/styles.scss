@@ -30,3 +30,10 @@ button, input, optgroup, select, textarea {
     outline: none;
     font-family: 'Open Sans', sans-serif;
 }
+
+.container {
+    max-width: 1600px;
+    margin: 20vh auto;
+    display: flex;
+    justify-content: center;
+}

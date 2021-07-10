@@ -128,7 +128,6 @@
         }
 
         &--link, &--title {
-            padding: $search-suggestions-item-padding;
             font-size: $search-suggestions-item-font-size;
             line-height: 24px;
         }
@@ -140,6 +139,7 @@
             background: $search-suggestions-title-bg;
             color: $search-color-gray-dark;
             margin-bottom: 4px;
+            padding: $search-suggestions-item-padding;
         }
 
         &--title-clear {
@@ -152,8 +152,10 @@
         }
 
         &--item {
+            position: relative;
 
             &._category {
+                display: block;
                 padding: 8px 16px;
                 border-top: 1px solid $search-border-color;
 
@@ -166,7 +168,7 @@
                 padding: 8px 0 0;
                 border-top: 1px solid $search-border-color;
 
-                &+&._product {
+                & + &._product {
                     padding-top: 0;
                     border-top: 0;
                 }
@@ -178,11 +180,10 @@
         }
 
         &--link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: block;
             color: $search-color;
             text-decoration: none;
+            padding: $search-suggestions-item-padding;
 
             &:hover, &:active {
                 background-color: $search-suggestions-item-hover-bg;
@@ -196,8 +197,8 @@
             }
 
             &._category-bread-crumb {
-                padding: 0;
                 display: inline;
+                padding: 0;
                 background: none;
                 margin-right: 4px;
                 color: $search-color-gray-dark;
@@ -260,11 +261,11 @@
                     padding-left: 5px;
                 }
 
-                &-sale {
+                &-discount {
                     color: #FFFFFF;
                     font-weight: 700;
                     border-radius: $search-border-radius;
-                    background: $search-sale-bg;
+                    background: $search-discount-bg;
                     padding: 0 8px;
                     margin-left: 8px;
                 }
@@ -282,6 +283,10 @@
         }
 
         &--clear {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: $search-suggestions-item-x-padding;
             @extend %btn-clear;
             color: $search-suggestions-clear-color;
             padding: 0;

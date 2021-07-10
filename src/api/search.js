@@ -1,5 +1,5 @@
 import axios from '@/plugins/axios'
-import routes from '@/routes'
+import routes from '@/api/routes'
 import $config from '@/config'
 
 const params = {
@@ -10,3 +10,4 @@ const params = {
 }
 
 export const getSuggestions = (q) => axios.get(routes.suggestionsPath(), { params: { q, ...params } })
+export const getPopularPhrases = () => axios.get(routes.popularPhrasesPath())

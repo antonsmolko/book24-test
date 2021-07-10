@@ -1,13 +1,13 @@
 <template>
     <div class="search__form-group--container">
         <div class="search__form-group--before">
-            <icon-search class="search__form-group--icon" />
+            <icon-search class="search__form-group--icon"/>
         </div>
         <input
             ref="input"
             @focusin="$emit('focusin')"
             @focusout="$emit('focusout')"
-            @input="handleInput"
+            @input="$emit('input', value)"
             v-model="value"
             id="search-input"
             type="text"
@@ -27,10 +27,6 @@
 
 <script>
 import IconSearch from '@/components/icons/IconSearch'
-import debounce from 'lodash/debounce'
-import config from '@/config'
-
-const _debounce = debounce(f => f(), config.SEARCH_DELAY)
 
 export default {
     name: 'SearchFormInput',
@@ -65,14 +61,6 @@ export default {
     },
 
     methods: {
-        handleInput () {
-            _debounce(this.emit)
-        },
-
-        emit () {
-            this.$emit('input', this.value)
-        },
-
         clear () {
             this.$emit('input', '')
             this.$refs.input.focus()

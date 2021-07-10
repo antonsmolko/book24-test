@@ -1,11 +1,12 @@
 import _ from 'lodash'
 import ls from '@/api/localStorage'
 import config from '@/config'
-import { getSuggestions } from '@/api/search'
+import { getSuggestions, getPopularPhrases } from '@/api/search'
 
 const state = {
   searchHistory: [],
   suggestions: [],
+  popularPhrases: [],
 }
 
 const mutations = {
@@ -26,10 +27,17 @@ const mutations = {
   },
   FETCH_SUGGESTIONS: (state, payload) => {
     state.suggestions = payload
+  },
+  FETCH_POPULAR_PHRASES: (state, payload) => {
+    state.popularPhrases = payload
   }
 }
 
 const actions = {
+  fetchPopularPhrases: async ({ commit }) => {
+    const { data } = await getPopularPhrases()
+    commit('FETCH_POPULAR_PHRASES', data.data.data)
+  },
   fetchSearchHistory: ({ commit }) => commit('FETCH_SEARCH_HISTORY'),
   setSearchHistory: ({ commit }, payload) => commit('SET_SEARCH_HISTORY', payload),
   addSearchHistoryItem: ({ commit }, payload) => commit('ADD_SEARCH_HISTORY_ITEM', payload),
@@ -43,7 +51,7 @@ const actions = {
 
 const getters = {
   limitedHistory: (state) => _.take(state.searchHistory, config.LIMIT_SEARCH_HISTORY),
-  popular: (state) => state.suggestions.filter(({ link }) => link.startsWith(config.PREFIX_LINK_POPULAR)),
+  hints: (state) => state.suggestions.filter(({ link }) => link.startsWith(config.PREFIX_LINK_HINT)),
   catalogs: (state) => state.suggestions.filter(({ link }) => link.startsWith(config.PREFIX_LINK_CATALOG)),
   products: (state) => state.suggestions.filter(({ link }) => link.startsWith(config.PREFIX_LINK_PRODUCT)),
   suggestionsLength: (state) => state.suggestions.length,
