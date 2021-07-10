@@ -162,6 +162,12 @@
                 &:first-of-type {
                     margin-top: 20px;
                 }
+
+                &._hovered {
+                    .search__suggestions--link._category {
+                        color: $search-suggestions-link-hover-color;
+                    }
+                }
             }
 
             &._product {
@@ -175,6 +181,19 @@
 
                 &:last-child {
                     padding-bottom: 8px;
+                }
+
+                &._hovered {
+                    .search__suggestions--product-title {
+                        color: $search-suggestions-link-hover-color;
+                    }
+                }
+            }
+
+            &._regular._hovered {
+                .search__suggestions--link {
+                    background-color: $search-suggestions-item-hover-bg;
+                    color: $search-suggestions-link-hover-color;
                 }
             }
         }
@@ -271,7 +290,7 @@
                 }
             }
 
-            &:hover, &:active {
+            &:hover, &:active, &._hovered {
                 .search__suggestions--product-title {
                     color: $search-suggestions-link-hover-color;
                 }

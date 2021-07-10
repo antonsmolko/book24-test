@@ -1,5 +1,5 @@
 <template>
-    <li class="search__suggestions--item">
+    <li class="search__suggestions--item _regular">
         <router-link
             :to="item.link"
             v-html="highlightedTitle"

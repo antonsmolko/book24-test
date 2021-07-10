@@ -1,5 +1,5 @@
 <template>
-    <div class="search__suggestions">
+    <div class="search__suggestions _regular">
         <div class="search__suggestions--title">
             История поиска
             <button
