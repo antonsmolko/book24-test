@@ -1,29 +1,7 @@
 <template>
     <div class="search__dropdown">
 
-            <div class="search__suggestions">
-                <div class="search__suggestions--title">
-                    Популярные запросы
-                </div>
-                <ul class="search__suggestions--list">
-                    <li class="search__suggestions--item">
-                        <a class="search__suggestions--link" href="#">
-                            мара и морок
-                        </a>
-                    </li>
-                    <li class="search__suggestions--item">
-                        <a class="search__suggestions--link" href="#">
-                            мара и морок
-                        </a>
 
-                    </li>
-                    <li class="search__suggestions--item">
-                        <a class="search__suggestions--link" href="#">
-                            мара и морок
-                        </a>
-                    </li>
-                </ul>
-            </div>
             <div class="search__suggestions">
                 <ul class="search__suggestions--list _category">
                     <li class="search__suggestions--item _category">

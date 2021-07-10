@@ -1,52 +1,96 @@
 <template>
-    <form @submit.prevent="submit" autocomplete="off" class="search">
+    <form ref="search" @submit.prevent="submit" autocomplete="off" class="search">
         <div class="search__form-group" :class="{ '_focus': uiState === 'focusin' }">
-        <div class="search__form-group--body">
-            <search-form-input
-                v-model="query"
-                @focusin="handleFocusing"
-                @focusout="handleFocusout"
-            />
+            <div class="search__form-group--body">
+                <search-form-input
+                    v-model="query"
+                    @focusin="handleFocusing"
+                    @focusout="handleFocusout"
+                />
+            </div>
+            <button type="submit" class="search__form-group--button">Найти</button>
         </div>
-        <button type="submit" class="search__form-group--button">Найти</button>
-    </div>
-        <div class="search__dropdown">
-            <search-history-list v-if="searchHistory" v-model="query" @search="search"/>
+        <div v-if="isVisibleDropdown" class="search__dropdown">
+            <dropdown-search-history-list
+                v-if="isVisibleHistory"
+                v-model="query"
+                @search="search"
+            />
+            <dropdown-popular-list
+                v-if="isVisiblePopular"
+                :list="popular"
+                :query="query"
+            />
         </div>
     </form>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import SearchFormInput from './components/SearchFormInput'
-import SearchHistoryList from './components/SearchHistoryList'
-
-import apiSearch from '@/api/search'
+import { mapState, mapActions, mapGetters } from 'vuex'
+import SearchFormInput from '@/components/search/components/SearchFormInput'
+import DropdownSearchHistoryList from '@/components/search/components/DropdownSearchHistoryList'
+import DropdownPopularList from '@/components/search/components/DropdownPopular/DropdownPopularList'
 
 export default {
     name: 'Search',
 
     components: {
         SearchFormInput,
-        SearchHistoryList
+        DropdownSearchHistoryList,
+        DropdownPopularList
     },
 
     data: () => ({
         processState: 'filling',
-        uiState: 'focusout',
+        uiState: 'initial',
         query: '',
-        suggestions: []
+        trackOutsideClick: null
     }),
 
     computed: {
         ...mapState('search', [
-            'searchHistory'
-        ])
+            'searchHistory',
+        ]),
+        ...mapGetters('search', [
+            'popular',
+            'catalogs',
+            'products',
+            'suggestionsLength'
+        ]),
+        isVisibleDropdown () {
+            return this.uiState !== 'initial' && (this.isVisibleHistory || this.isVisiblePopular)
+        },
+        isVisibleHistory () {
+            return !this.query && this.searchHistory.length > 0
+        },
+        isVisiblePopular () {
+            return this.query && this.popular.length > 0
+        }
+    },
+
+    watch: {
+        query () {
+            this.search()
+        }
+    },
+
+    created () {
+        this.fetchSearchHistory()
+    },
+
+    mounted () {
+        this.listenOutsideClick()
+    },
+
+    beforeDestroy () {
+        this.unListenOutsideClick()
     },
 
     methods: {
         ...mapActions('search', [
-            'addSearchHistoryItem'
+            'fetchSearchHistory',
+            'addSearchHistoryItem',
+            'fetchSuggestions'
         ]),
 
         handleFocusing () {
@@ -59,21 +103,38 @@ export default {
         },
 
         async submit () {
-            await this.search()
             this.addSearchHistoryItem(this.query)
         },
 
         async search () {
-            if (!this.query.trim()) {
+            const query = this.query.trim()
+
+            if (!query) {
                 return
             }
 
             this.processState = 'request'
 
-            const { data } = await apiSearch.getSuggestions(this.query)
+            await this.fetchSuggestions(query)
 
-            this.suggestions = data.DATA
             this.processState = 'success'
+        },
+
+        listenOutsideClick () {
+            document.addEventListener('click', this.initUiStateByClickTarget)
+        },
+
+        unListenOutsideClick () {
+            document.removeEventListener('click', this.initUiStateByClickTarget)
+        },
+
+        initUiStateByClickTarget ({ target }) {
+            const searchEl = this.$refs.search
+            const isClickInside = searchEl.contains(target)
+
+            if (!isClickInside) {
+                this.uiState = 'initial'
+            }
         }
     }
 }

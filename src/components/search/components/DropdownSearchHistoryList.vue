@@ -10,7 +10,7 @@
         </div>
         <ul class="search__suggestions--list">
             <li
-                v-for="(item, index) in limitedSearchHistory"
+                v-for="(item, index) in limitedHistory"
                 :key="index"
                 class="search__suggestions--item"
             >
@@ -32,11 +32,11 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import IconClear from '@/components/icons/IconClear'
 
 export default {
-    name: 'SearchHistoryList',
+    name: 'DropdownSearchHistoryList',
 
     components: {
         IconClear
@@ -51,24 +51,21 @@ export default {
     }),
 
     computed: {
-        limitedSearchHistory () {
-            return this.$store.getters['search/takeSearchHistory'](this.$config.SEARCH_HISTORY_LIMIT)
-        }
-    },
-
-    created () {
-        this.fetchSearchHistory()
+        ...mapGetters('search', [
+            'limitedHistory'
+        ])
     },
 
     methods: {
         ...mapActions('search', [
-            'fetchSearchHistory',
             'setSearchHistory',
             'removeSearchHistoryItem'
         ]),
+
         clearAll () {
             this.setSearchHistory([])
         },
+
         removeItem (item) {
             this.removeSearchHistoryItem(item)
         }

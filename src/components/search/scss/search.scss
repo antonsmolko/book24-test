@@ -12,6 +12,7 @@
 }
 
 .search {
+    position: relative;
     width: 890px;
     max-width: 100%;
     height: $search-height;
@@ -107,6 +108,10 @@
     }
 
     &__dropdown {
+        position: absolute;
+        top: calc(100% + 2 * #{$search-border-width});
+        left: 0;
+        width: 100%;
         background: $search-background;
         border: 1px solid $search-border-color;
         border-radius: 0 0 $search-border-radius $search-border-radius;
