@@ -1,10 +1,10 @@
 <template>
     <li class="search__suggestions--item _regular">
-        <router-link
-            :to="item.link"
+        <a
+            href="#"
             v-html="highlightedTitle"
-            @click="$emit('search', item.title)"
-            class="search__suggestions--link"
+            @click.prevent="$emit('submit', item.title)"
+            class="search__suggestions--link smart-link"
         />
     </li>
 </template>
@@ -14,6 +14,11 @@ import { highlightingTextByValue} from "@/helpers"
 
 export default {
     name: 'HintItem',
+
+    model: {
+        event: 'submit',
+        prop: 'query'
+    },
 
     props: {
         item: {

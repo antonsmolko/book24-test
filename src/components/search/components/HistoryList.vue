@@ -1,5 +1,5 @@
 <template>
-    <div class="search__suggestions _regular">
+    <div class="search__suggestions">
         <div class="search__suggestions--title">
             История поиска
             <button
@@ -12,15 +12,15 @@
             <li
                 v-for="(item, index) in limitedHistory"
                 :key="index"
-                class="search__suggestions--item"
+                class="search__suggestions--item _regular"
             >
-                <router-link
-                    :to="`/search/?q=${item}`"
-                    @click.native="$emit('click', item)"
-                    class="search__suggestions--link"
+                <a
+                    href="#"
+                    @click.prevent="$emit('submit', item)"
+                    class="search__suggestions--link smart-link"
                 >
                     {{ item }}
-                </router-link>
+                </a>
                 <button
                     @click.stop="removeItem(item)"
                     type="button"
@@ -43,7 +43,7 @@ export default {
     },
 
     model: {
-        event: 'click',
+        event: 'submit'
     },
 
     data: () => ({

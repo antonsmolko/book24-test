@@ -3,7 +3,7 @@
         <router-link
             @click="$emit('search', item.title)"
             :to="item.link"
-            class="search__suggestions--product"
+            class="search__suggestions--product smart-link"
         >
             <span class="search__suggestions--product-image">
                 <img :src="item.meta.image" alt="">

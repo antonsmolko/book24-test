@@ -6,7 +6,6 @@
         <input
             ref="input"
             @focusin="$emit('focusin')"
-            @focusout="$emit('focusout')"
             @input="$emit('input', value)"
             v-model="value"
             id="search-input"
@@ -44,6 +43,10 @@ export default {
         model: {
             type: String,
             default: ''
+        },
+        blur: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -57,13 +60,24 @@ export default {
                 this.value = value
             },
             immediate: true
+        },
+        blur (value) {
+            value && this.onBlur()
         }
     },
 
     methods: {
         clear () {
             this.$emit('input', '')
+            this.focusin()
+        },
+
+        focusin () {
             this.$refs.input.focus()
+        },
+
+        onBlur () {
+            this.$refs.input.blur()
         }
     }
 }

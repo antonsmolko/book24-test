@@ -4,7 +4,7 @@
             v-html="highlightingTextByValue(item.title, query)"
             :to="item.link"
             @click="$emit('search', item.title)"
-            class="search__suggestions--link _category"
+            class="search__suggestions--link smart-link _category"
         />
         <div class="search__suggestions--bread-crumbs">
             <router-link

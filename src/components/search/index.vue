@@ -1,8 +1,18 @@
 <template>
-    <form ref="search" @submit.prevent="submit" autocomplete="off" class="search">
+    <form
+        ref="search"
+        @submit.prevent="formSubmit"
+        autocomplete="off"
+        class="search"
+    >
         <div class="search__form-group" :class="{ '_focus': uiState === 'focusin' }">
             <div class="search__form-group--body">
-                <search-form-input v-model="query" @focusin="handleFocusing"/>
+                <search-form-input
+                    v-model="query"
+                    :blur="!isVisibleDropdown"
+                    @focusin="handleFocusing"
+                    @input="handleSearchInput"
+                />
             </div>
             <button type="submit" class="search__form-group--button">Найти</button>
         </div>
@@ -12,8 +22,9 @@
                     <hint-item
                         v-for="item in hints"
                         :key="item.link"
-                        :query="query"
+                        v-model="query"
                         :item="item"
+                        @submit="submit"
                     />
                     <category-item
                         v-for="item in catalogs"
@@ -33,8 +44,7 @@
                 <history-list
                     v-if="isVisibleHistory"
                     v-model="query"
-                    :query="query"
-                    @click="addSearchHistoryItem"
+                    @submit="submit"
                 />
                 <popular-list
                     v-if="isVisiblePopular"
@@ -49,15 +59,16 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
-import get from 'lodash/get'
 import SearchFormInput from '@/components/search/components/SearchFormInput'
 import HistoryList from '@/components/search/components/HistoryList'
 import PopularList from '@/components/search/components/PopularList'
 import HintItem from "@/components/search/components/Suggestions/HintItem"
 import CategoryItem from "@/components/search/components/Suggestions/CategoryItem"
 import ProductItem from "@/components/search/components/Suggestions/ProductItem"
+import get from 'lodash/get'
 import debounce from 'lodash/debounce'
 import config from '@/config'
+import { arrowNavigate } from "@/helpers"
 
 const _debounce = debounce(f => f(), config.SEARCH_DELAY)
 
@@ -78,7 +89,8 @@ export default {
         popularProcessState: 'initial',
         uiState: 'initial',
         query: '',
-        trackOutsideClick: null
+        trackOutsideClick: null,
+        currentHoveredIndex: -1,
     }),
 
     computed: {
@@ -107,8 +119,11 @@ export default {
     },
 
     watch: {
-        query () {
-            _debounce(this.search)
+        isVisibleSuggestions () {
+            this.currentHoveredIndex = -1
+        },
+        isVisibleDropdown () {
+            this.currentHoveredIndex = -1
         }
     },
 
@@ -126,10 +141,12 @@ export default {
 
     mounted () {
         this.listenOutsideClick()
+        window.addEventListener('keyup', this.handleKeyUp)
     },
 
     beforeDestroy () {
         this.unListenOutsideClick()
+        window.removeEventListener('keyup', this.handleKeyUp)
     },
 
     methods: {
@@ -142,25 +159,42 @@ export default {
 
         handleFocusing () {
             this.uiState = 'opened'
+            console.log('opened')
             this.searchProcessState = 'filling'
             this.search()
         },
 
-        submit () {
-            const q = this.query
+        formSubmit () {
+            if (this.query && this.currentHoveredIndex === -1) {
+                this.search()
+                this.addSearchHistoryItem(this.query)
+                this.currentHoveredIndex = -1
+            }
+        },
+
+        submit (q) {
+            console.log('submit')
+            console.log('index ', this.currentHoveredIndex)
+            console.log('query ', q)
             this.addSearchHistoryItem(q)
+            this.uiState = 'initial'
+            this.searchProcessState = 'initial'
 
             if (q !== this.$route.query.q) {
                 this.$router.push({ name: 'search', query: { q } })
             }
+
+        },
+
+        handleSearchInput () {
+            _debounce(this.search)
+            this.currentHoveredIndex = -1
         },
 
         async search () {
             const query = this.query.trim()
 
-            if (!query) {
-                return
-            }
+            if (!query) return
 
             this.searchProcessState = 'request'
 
@@ -181,10 +215,23 @@ export default {
             const searchEl = this.$refs.search
             const isClickInside = searchEl.contains(target)
 
-            this.uiState = isClickInside ? 'opened' : 'initial'
-
             if (!isClickInside) {
+                this.uiState = 'initial'
                 this.searchProcessState = 'initial'
+            }
+        },
+
+        handleKeyUp () {
+            if (this.uiState === 'opened') {
+                arrowNavigate({
+                    parentSelector: '.search',
+                    itemSelector: '.search__suggestions--item',
+                    smartLinkSelector: '.smart-link',
+                    currentIndex: this.currentHoveredIndex,
+                    callback: (nextIndex) => {
+                        this.currentHoveredIndex = nextIndex
+                    }
+                })
             }
         }
     }
