@@ -160,7 +160,6 @@ export default {
 
         handleFocusing () {
             this.uiState = 'opened'
-            console.log('opened')
             this.searchProcessState = 'filling'
             this.search()
         },
@@ -174,9 +173,6 @@ export default {
         },
 
         submit (q) {
-            console.log('submit')
-            console.log('index ', this.currentHoveredIndex)
-            console.log('query ', q)
             this.addSearchHistoryItem(q)
             this.uiState = 'initial'
             this.searchProcessState = 'initial'
