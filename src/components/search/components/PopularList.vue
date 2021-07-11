@@ -3,11 +3,11 @@
         <div class="search__suggestions--title">Популярные запросы</div>
         <ul class="search__suggestions--list">
             <li v-for="item in list" :key="item.id" class="search__suggestions--item">
-                <router-link
-                    :to="`/search/?q=${item.attributes.phrase}`"
-                    @click.native="$emit('click', item.attributes.phrase)"
+                <a
+                    href="#"
+                    @click.prevent="$emit('submit', item.attributes.phrase)"
                     class="search__suggestions--link"
-                >{{ item.attributes.phrase }}</router-link>
+                >{{ item.attributes.phrase }}</a>
             </li>
         </ul>
     </div>
@@ -18,7 +18,7 @@ export default {
     name: "PopularList",
 
     model: {
-        event: 'click'
+        event: 'submit'
     },
 
     props: {

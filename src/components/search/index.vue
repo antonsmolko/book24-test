@@ -39,8 +39,8 @@
                 <popular-list
                     v-if="isVisiblePopular"
                     :list="popularPhrases"
-                    :query="query"
-                    @click="addSearchHistoryItem"
+                    v-model="query"
+                    @submit="submit"
                 />
             </template>
         </div>
