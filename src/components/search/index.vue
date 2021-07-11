@@ -45,6 +45,7 @@
                     v-if="isVisibleHistory"
                     v-model="query"
                     @submit="submit"
+                    @remove-item="handleRemoveHistoryItem"
                 />
                 <popular-list
                     v-if="isVisiblePopular"
@@ -232,6 +233,12 @@ export default {
                         this.currentHoveredIndex = nextIndex
                     }
                 })
+            }
+        },
+
+        handleRemoveHistoryItem (index) {
+            if (this.currentHoveredIndex > index) {
+                this.currentHoveredIndex -= 1
             }
         }
     }

@@ -22,7 +22,7 @@
                     {{ item }}
                 </a>
                 <button
-                    @click.stop="removeItem(item)"
+                    @click.stop="removeItem(item, index)"
                     type="button"
                     class="search__suggestions--clear"
                 ><icon-clear/></button>
@@ -66,8 +66,9 @@ export default {
             this.setSearchHistory([])
         },
 
-        removeItem (item) {
+        removeItem (item, index) {
             this.removeSearchHistoryItem(item)
+            this.$emit('remove-item', index)
         }
     }
 }
