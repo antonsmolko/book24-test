@@ -17,7 +17,7 @@
             class="search__form-group--control"
         >
         <div class="search__form-group--after">
-            <button @click="clear" type="button" class="search__form-group--clear">
+            <button v-show="value" @click="clear" type="button" class="search__form-group--clear">
                 <img src="@/assets/img/svg/close-circle.svg" alt="clear">
             </button>
         </div>
