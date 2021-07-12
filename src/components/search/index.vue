@@ -166,8 +166,7 @@ export default {
 
         formSubmit () {
             if (this.query && this.currentHoveredIndex === -1) {
-                this.search()
-                this.addSearchHistoryItem(this.query)
+                this.submit(this.query)
                 this.currentHoveredIndex = -1
             }
         },
