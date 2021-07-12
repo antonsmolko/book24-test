@@ -8,15 +8,13 @@ const isAvailable = () => {
   }
 }
 
-const has = (key) => isAvailable() && Boolean(window.localStorage.getItem(key))
-
-const getItem = (item, byDefault = null) => has(item)
+const getItem = (item, byDefault = null) => isAvailable()
   ? JSON.parse(window.localStorage.getItem(item))
   : byDefault
 
-const setItem = (item, value) => has(item) && window.localStorage.setItem(item, JSON.stringify(value))
+const setItem = (item, value) => isAvailable() && window.localStorage.setItem(item, JSON.stringify(value))
 
-const getSearchHistory = () => getItem(config.LOCAL_STORAGE_HISTORY_KEY, [])
+const getSearchHistory = () => getItem(config.LOCAL_STORAGE_HISTORY_KEY) || []
 
 const setSearchHistory = (value) => setItem(config.LOCAL_STORAGE_HISTORY_KEY, value)
 
