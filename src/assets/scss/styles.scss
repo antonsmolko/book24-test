@@ -31,6 +31,17 @@ button, input, optgroup, select, textarea {
     font-family: 'Open Sans', sans-serif;
 }
 
+input[type=text]::-ms-clear, input[type=text]::-ms-reveal {
+    display: none; width : 0; height: 0;
+}
+
+input::-webkit-search-decoration,
+input::-webkit-search-cancel-button,
+input::-webkit-search-results-button,
+input::-webkit-search-results-decoration {
+    display: none;
+}
+
 .container {
     max-width: 1600px;
     margin: 20vh auto;
