@@ -1,5 +1,7 @@
 # book24-test
 
+![book24-test](https://github.com/antonsmolko/book24-test/blob/main/src/assets/img/demo.jpg)
+
 ## Project setup
 ```
 npm install
